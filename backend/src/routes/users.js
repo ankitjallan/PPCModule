@@ -85,6 +85,16 @@ router.post('/', async (req, res) => {
   }
 });
 
+// GET /api/users/roles - list all roles (must be before /:id to avoid route conflict)
+router.get('/roles', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, name, description FROM roles ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch roles' });
+  }
+});
+
 // PUT /api/users/:id - update user
 router.put('/:id', async (req, res) => {
   try {
@@ -173,16 +183,6 @@ router.post('/:id/reset-password', async (req, res) => {
   } catch (err) {
     console.error('Reset password error:', err);
     res.status(500).json({ error: 'Failed to reset password' });
-  }
-});
-
-// GET /api/users/roles - list all roles
-router.get('/roles', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT id, name, description FROM roles ORDER BY id');
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch roles' });
   }
 });
 
