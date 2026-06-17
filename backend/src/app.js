@@ -2,6 +2,20 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+
+const pool = require('./config/database');
+
+// Run schema migration on startup (idempotent — uses IF NOT EXISTS)
+(async () => {
+  try {
+    const sql = fs.readFileSync(path.join(__dirname, '../../migrations/001_schema.sql'), 'utf8');
+    await pool.query(sql);
+    console.log('DB schema ready');
+  } catch (e) {
+    console.warn('Schema migration warning (may already exist):', e.message.slice(0, 100));
+  }
+})();
 
 const app = express();
 
