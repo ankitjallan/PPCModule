@@ -1,0 +1,11 @@
+{
+  "name": "mipl-ppc",
+  "version": "1.0.0",
+  "description": "MIPL Production Planning & Control Module",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm ci && npm run build && xcopy /E /Y dist ..\\backend\\public\\",
+    "start": "cd backend && node src/app.js",
+    "release": "node scripts/release.js"
+  }
+}

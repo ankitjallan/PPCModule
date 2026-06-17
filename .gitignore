@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+backend/.env
+
+# Build output
+frontend/dist/
+backend/public/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Fly.io
+.fly/
+
+# Excel source file (not needed in repo)
+*.xlsx
+
+# Ghost directories created by path concatenation
+CDevelopments*/
+
+# Misc
+*.tmp
+diagnose.bat
