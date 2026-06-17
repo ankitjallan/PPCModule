@@ -1,4 +1,4 @@
-app = "mipl-ppc"
+app = "ppcmodule"
 primary_region = "sin"
 
 [build]
