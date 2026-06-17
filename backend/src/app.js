@@ -6,14 +6,30 @@ const fs = require('fs');
 
 const pool = require('./config/database');
 
-// Run schema migration on startup (idempotent — uses IF NOT EXISTS)
+// Run schema migration + ensure admin user on startup
 (async () => {
   try {
-    const sql = fs.readFileSync(path.join(__dirname, '../../migrations/001_schema.sql'), 'utf8');
+    const sql = fs.readFileSync(path.join(__dirname, '../migrations/001_schema.sql'), 'utf8');
     await pool.query(sql);
     console.log('DB schema ready');
   } catch (e) {
-    console.warn('Schema migration warning (may already exist):', e.message.slice(0, 100));
+    console.warn('Schema migration warning:', e.message.slice(0, 120));
+  }
+  try {
+    const bcrypt = require('bcryptjs');
+    const hash = await bcrypt.hash('Admin@1234', 10);
+    const roleRes = await pool.query(`SELECT id FROM roles WHERE name='admin' LIMIT 1`);
+    if (roleRes.rows[0]) {
+      await pool.query(
+        `INSERT INTO users (name, email, password_hash, role_id)
+         VALUES ('Admin','admin@mipl.com',$1,$2)
+         ON CONFLICT (email) DO UPDATE SET password_hash=$1`,
+        [hash, roleRes.rows[0].id]
+      );
+      console.log('Admin user ready');
+    }
+  } catch (e) {
+    console.warn('Admin seed warning:', e.message.slice(0, 120));
   }
 })();
 
