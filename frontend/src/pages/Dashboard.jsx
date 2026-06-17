@@ -9,7 +9,11 @@ import DateRangePicker from '../components/ui/DateRangePicker';
 import Badge from '../components/ui/Badge';
 import { FullPageSpinner } from '../components/ui/Spinner';
 
-const fmtDate = (d) => new Date(d + 'T00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+const fmtDate = (d) => {
+  if (!d) return '';
+  const date = new Date(String(d).includes('T') ? d : d + 'T00:00');
+  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+};
 const fmtNum = (n) => Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 
 const PIE_COLORS = ['#1e3a8a','#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6'];
