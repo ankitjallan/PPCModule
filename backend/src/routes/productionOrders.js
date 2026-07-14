@@ -296,6 +296,7 @@ router.get('/:id', async (req, res) => {
     if (!po) return res.status(404).json({ error: 'Production order not found' });
     res.json(po);
   } catch (err) {
+    console.error('Get production order error:', err);
     res.status(500).json({ error: 'Failed to fetch production order' });
   }
 });
@@ -348,6 +349,7 @@ router.put('/:id/spec-override', authorize('admin', 'ppc_planner'), async (req, 
     res.json(fullPo);
   } catch (err) {
     await client.query('ROLLBACK');
+    console.error('Spec sheet override error:', err);
     res.status(500).json({ error: 'Failed to override spec sheet' });
   } finally {
     client.release();

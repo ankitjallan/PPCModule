@@ -157,7 +157,7 @@ const MachinePlans = () => {
                   <h3 className="font-semibold text-gray-800">{plan.machine_name}</h3>
                   <p className="text-xs text-gray-500">{plan.process_category} • Speed: {plan.speed_mpm} m/min</p>
                 </div>
-                <p className="text-sm text-gray-500">{new Date(plan.plan_date + 'T00:00').toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+                <p className="text-sm text-gray-500">{plan.plan_date && new Date(plan.plan_date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
               </div>
 
               {/* Gantt-style timeline */}

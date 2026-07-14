@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
     const result = await pool.query('SELECT * FROM process_categories ORDER BY sequence_order, name');
     res.json(result.rows);
   } catch (err) {
+    console.error('Get process categories error:', err);
     res.status(500).json({ error: 'Failed to fetch process categories' });
   }
 });
@@ -38,11 +39,12 @@ router.put('/:id', authorize('admin'), async (req, res) => {
          name = COALESCE($1, name),
          sequence_order = COALESCE($2, sequence_order)
        WHERE id = $3 RETURNING *`,
-      [name, sequence_order, req.params.id]
+      [name, sequence_order === '' ? null : sequence_order, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Category not found' });
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Update process category error:', err);
     res.status(500).json({ error: 'Failed to update process category' });
   }
 });

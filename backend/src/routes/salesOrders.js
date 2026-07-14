@@ -85,13 +85,13 @@ router.post('/', authorize('admin', 'sales', 'ppc_planner'), async (req, res) =>
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
       [soNumber, customer_id, fg_code_id, job_name, order_type || 'NEW',
-       qty_kg, qty_rolls, delivery_date, priority || 'NORMAL', remarks, req.user.id]
+       qty_kg, qty_rolls === '' ? null : qty_rolls, delivery_date, priority || 'NORMAL', remarks, req.user.id]
     );
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Create sales order error:', err);
-    res.status(500).json({ error: 'Failed to create sales order' });
+    res.status(500).json({ error: err.message || 'Failed to create sales order' });
   }
 });
 
@@ -114,6 +114,7 @@ router.get('/:id', async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ error: 'Sales order not found' });
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Get sales order error:', err);
     res.status(500).json({ error: 'Failed to fetch sales order' });
   }
 });
@@ -132,12 +133,14 @@ router.put('/:id', authorize('admin', 'sales', 'ppc_planner'), async (req, res) 
          remarks = COALESCE($6, remarks),
          updated_at = NOW()
        WHERE id = $7 RETURNING *`,
-      [job_name, qty_kg, qty_rolls, delivery_date, priority, remarks, req.params.id]
+      [job_name, qty_kg === '' ? null : qty_kg, qty_rolls === '' ? null : qty_rolls,
+       delivery_date, priority, remarks, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Sales order not found' });
     res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to update sales order' });
+    console.error('Update sales order error:', err);
+    res.status(500).json({ error: err.message || 'Failed to update sales order' });
   }
 });
 
@@ -156,6 +159,7 @@ router.patch('/:id/status', authorize('admin', 'ppc_planner'), async (req, res) 
     if (result.rows.length === 0) return res.status(404).json({ error: 'Sales order not found' });
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Update sales order status error:', err);
     res.status(500).json({ error: 'Failed to update status' });
   }
 });

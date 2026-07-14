@@ -36,7 +36,7 @@ router.post('/entries', authorize('admin', 'ppc_planner', 'machine_operator'), a
             actual_output_kg, actual_output_km, waste_kg, operator_name, remarks, entered_by)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
          RETURNING *`,
-        [production_order_id, stage, machine_id, shift_no,
+        [production_order_id, stage, machine_id === '' ? null : machine_id, shift_no === '' ? null : shift_no,
          entry_date || new Date().toISOString().split('T')[0],
          actual_output_kg || 0, actual_output_km || 0, waste_kg || 0,
          operator_name, remarks, req.user.id]
@@ -170,6 +170,7 @@ router.get('/summary/:productionOrderId', async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Get PTD summary error:', err);
     res.status(500).json({ error: 'Failed to fetch PTD summary' });
   }
 });

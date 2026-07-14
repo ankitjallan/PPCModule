@@ -180,6 +180,7 @@ router.put('/jobs/:jobId', authorize('admin', 'ppc_planner', 'machine_operator')
     if (result.rows.length === 0) return res.status(404).json({ error: 'Job not found' });
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Update machine plan job error:', err);
     res.status(500).json({ error: 'Failed to update job' });
   }
 });
@@ -193,6 +194,7 @@ router.delete('/jobs/:jobId', authorize('admin', 'ppc_planner'), async (req, res
     if (result.rows.length === 0) return res.status(404).json({ error: 'Job not found' });
     res.json({ message: 'Job removed from plan' });
   } catch (err) {
+    console.error('Delete machine plan job error:', err);
     res.status(500).json({ error: 'Failed to delete job' });
   }
 });

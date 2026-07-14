@@ -1,6 +1,6 @@
 ﻿{
     "name":  "mipl-ppc",
-    "version":  "1.0.7",
+    "version":  "1.0.8",
     "description":  "MIPL Production Planning \u0026 Control Module",
     "private":  true,
     "scripts":  {

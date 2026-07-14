@@ -44,7 +44,7 @@ const PendingOrders = () => {
 
   useEffect(() => { load(); }, []);
 
-  const fmtDate = (d) => d ? new Date(d + 'T00:00').toLocaleDateString('en-IN') : '-';
+  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : '-';
 
   return (
     <div className="space-y-4">

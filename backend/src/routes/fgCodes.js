@@ -31,6 +31,7 @@ router.get('/', async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Get FG codes error:', err);
     res.status(500).json({ error: 'Failed to fetch FG codes' });
   }
 });
@@ -45,10 +46,11 @@ router.post('/', authorize('admin', 'ppc_planner', 'sales'), async (req, res) =>
 
     const result = await pool.query(
       'INSERT INTO fg_codes (fg_code, description, customer_id, fg_type) VALUES ($1, $2, $3, $4) RETURNING *',
-      [fg_code.toUpperCase(), description, customer_id, fg_type]
+      [fg_code.toUpperCase(), description, customer_id === '' ? null : customer_id, fg_type]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
+    console.error('Create FG code error:', err);
     res.status(500).json({ error: 'Failed to create FG code' });
   }
 });
@@ -64,11 +66,12 @@ router.put('/:id', authorize('admin', 'ppc_planner', 'sales'), async (req, res) 
          is_active = COALESCE($4, is_active),
          updated_at = NOW()
        WHERE id = $5 RETURNING *`,
-      [description, customer_id, fg_type, is_active, req.params.id]
+      [description, customer_id === '' ? null : customer_id, fg_type, is_active, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'FG code not found' });
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Update FG code error:', err);
     res.status(500).json({ error: 'Failed to update FG code' });
   }
 });

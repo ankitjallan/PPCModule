@@ -103,6 +103,7 @@ router.delete('/:id', authorize('admin'), async (req, res) => {
     }
     res.json({ message: 'Customer deactivated' });
   } catch (err) {
+    console.error('Deactivate customer error:', err);
     res.status(500).json({ error: 'Failed to deactivate customer' });
   }
 });

@@ -5,6 +5,8 @@ const { authenticate, authorize } = require('../middleware/auth');
 const router = express.Router();
 router.use(authenticate);
 
+const n = (v) => (v === '' || v === undefined ? null : v);
+
 // GET /api/machines
 router.get('/', async (req, res) => {
   try {
@@ -53,7 +55,7 @@ router.post('/', authorize('admin'), async (req, res) => {
     const result = await pool.query(
       `INSERT INTO machines (name, machine_code, process_category_id, speed_mpm, width_mm)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [name, machine_code.toUpperCase(), process_category_id, speed_mpm || 0, width_mm || 0]
+      [name, machine_code.toUpperCase(), n(process_category_id), speed_mpm || 0, width_mm || 0]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -75,7 +77,7 @@ router.put('/:id', authorize('admin'), async (req, res) => {
          is_active = COALESCE($5, is_active),
          updated_at = NOW()
        WHERE id = $6 RETURNING *`,
-      [name, process_category_id, speed_mpm, width_mm, is_active, req.params.id]
+      [name, n(process_category_id), n(speed_mpm), n(width_mm), is_active, req.params.id]
     );
 
     if (result.rows.length === 0) {
@@ -83,6 +85,7 @@ router.put('/:id', authorize('admin'), async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Update machine error:', err);
     res.status(500).json({ error: 'Failed to update machine' });
   }
 });

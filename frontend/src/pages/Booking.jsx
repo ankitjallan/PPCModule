@@ -92,7 +92,12 @@ const Booking = () => {
     }
     setSaving(true);
     try {
-      await orderService.createSalesOrder(form);
+      const payload = {
+        ...form,
+        qty_kg: form.qty_kg === '' ? null : Number(form.qty_kg),
+        qty_rolls: form.qty_rolls === '' ? null : Number(form.qty_rolls),
+      };
+      await orderService.createSalesOrder(payload);
       showToast('Sales order created successfully');
       setModal(false);
       setForm(EMPTY_FORM);
@@ -114,7 +119,7 @@ const Booking = () => {
     }
   };
 
-  const fmtDate = (d) => d ? new Date(d + 'T00:00').toLocaleDateString('en-IN') : '-';
+  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : '-';
 
   const columns = [
     { key: 'so_number', header: 'SO Number', render: (v) => <span className="font-mono text-xs font-semibold text-blue-800">{v}</span> },

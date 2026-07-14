@@ -42,7 +42,7 @@ const OrderBook = () => {
     setPage(1);
   };
 
-  const fmtDate = (d) => d ? new Date(d + 'T00:00').toLocaleDateString('en-IN') : '-';
+  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : '-';
 
   const isOverdue = (date, status) =>
     date && new Date(date) < new Date() && !['COMPLETED', 'CANCELLED'].includes(status);

@@ -5,6 +5,8 @@ const { authenticate, authorize } = require('../middleware/auth');
 const router = express.Router();
 router.use(authenticate);
 
+const n = (v) => (v === '' || v === undefined ? null : v);
+
 // GET /api/spec-sheets
 router.get('/', async (req, res) => {
   try {
@@ -63,6 +65,7 @@ router.get('/fg/:fgCodeId', async (req, res) => {
 
     res.json({ ...sheet, films: films.rows, cylinder: cylinder.rows[0] || null, process: process.rows[0] || null });
   } catch (err) {
+    console.error('Get spec sheet by FG code error:', err);
     res.status(500).json({ error: 'Failed to fetch spec sheet' });
   }
 });
@@ -92,6 +95,7 @@ router.get('/:id', async (req, res) => {
 
     res.json({ ...sheet, films: films.rows, cylinder: cylinder.rows[0] || null, process: process.rows[0] || null });
   } catch (err) {
+    console.error('Get spec sheet by id error:', err);
     res.status(500).json({ error: 'Failed to fetch spec sheet' });
   }
 });
@@ -130,8 +134,8 @@ router.post('/', authorize('admin', 'ppc_planner'), async (req, res) => {
          (fg_code_id, version, is_current, total_gsm, width_mm, job_name, no_of_colors, no_of_ups, reel_width_mm, repeat_length_mm, notes, created_by)
        VALUES ($1, $2, TRUE, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
-      [fg_code_id, version, total_gsm, width_mm, job_name, no_of_colors || 0, no_of_ups || 1,
-       reel_width_mm, repeat_length_mm, notes, req.user.id]
+      [fg_code_id, version, n(total_gsm), n(width_mm), job_name, no_of_colors || 0, no_of_ups || 1,
+       n(reel_width_mm), n(repeat_length_mm), notes, req.user.id]
     );
     const sheet = ssResult.rows[0];
 
@@ -143,7 +147,7 @@ router.post('/', authorize('admin', 'ppc_planner'), async (req, res) => {
              (spec_sheet_id, layer_no, raw_material_id, item_code, item_name, gsm, width_mm, micron, std_wastage, notes)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
           [sheet.id, film.layer_no, film.raw_material_id || null, film.item_code,
-           film.item_name, film.gsm, film.width_mm, film.micron, film.std_wastage || 5, film.notes]
+           film.item_name, n(film.gsm), n(film.width_mm), n(film.micron), film.std_wastage || 5, film.notes]
         );
       }
     }
@@ -154,7 +158,7 @@ router.post('/', authorize('admin', 'ppc_planner'), async (req, res) => {
         `INSERT INTO spec_sheet_cylinders
            (spec_sheet_id, cylinder_type, circumference_mm, cylinder_code, supplier, remarks)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [sheet.id, cylinder.cylinder_type, cylinder.circumference_mm,
+        [sheet.id, cylinder.cylinder_type, n(cylinder.circumference_mm),
          cylinder.cylinder_code, cylinder.supplier, cylinder.remarks]
       );
     }
@@ -245,7 +249,7 @@ router.put('/:id', authorize('admin', 'ppc_planner'), async (req, res) => {
              (spec_sheet_id, layer_no, raw_material_id, item_code, item_name, gsm, width_mm, micron, std_wastage, notes)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
           [sheet.id, film.layer_no, film.raw_material_id || null, film.item_code,
-           film.item_name, film.gsm, film.width_mm, film.micron, film.std_wastage || 5, film.notes]
+           film.item_name, n(film.gsm), n(film.width_mm), n(film.micron), film.std_wastage || 5, film.notes]
         );
       }
     }
@@ -254,7 +258,7 @@ router.put('/:id', authorize('admin', 'ppc_planner'), async (req, res) => {
       await client.query(
         `INSERT INTO spec_sheet_cylinders (spec_sheet_id, cylinder_type, circumference_mm, cylinder_code, supplier, remarks)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [sheet.id, cylinder.cylinder_type, cylinder.circumference_mm, cylinder.cylinder_code, cylinder.supplier, cylinder.remarks]
+        [sheet.id, cylinder.cylinder_type, n(cylinder.circumference_mm), cylinder.cylinder_code, cylinder.supplier, cylinder.remarks]
       );
     }
 

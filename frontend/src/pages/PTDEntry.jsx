@@ -95,7 +95,7 @@ const PTDEntry = () => {
   const poOpts = pendingOrders.map(o => ({ value: o.id, label: `${o.wo_number} | ${o.so_number} | ${o.customer_name}` }));
 
   const historyColumns = [
-    { key: 'entry_date', header: 'Date', render: (v) => new Date(v + 'T00:00').toLocaleDateString('en-IN') },
+    { key: 'entry_date', header: 'Date', render: (v) => v ? new Date(v).toLocaleDateString('en-IN') : '-' },
     { key: 'so_number', header: 'SO #', render: (v) => <span className="font-mono text-xs text-blue-700">{v}</span> },
     { key: 'fg_code', header: 'FG Code', render: (v) => <span className="font-mono text-xs">{v}</span> },
     { key: 'customer_name', header: 'Customer' },

@@ -5,6 +5,8 @@ const { authenticate, authorize } = require('../middleware/auth');
 const router = express.Router();
 router.use(authenticate);
 
+const n = (v) => (v === '' || v === undefined ? null : v);
+
 // GET /api/raw-materials
 router.get('/', async (req, res) => {
   try {
@@ -55,7 +57,7 @@ router.post('/', authorize('admin', 'store_inventory', 'ppc_planner'), async (re
       `INSERT INTO raw_materials (item_code, item_name, item_type, item_subtype, gsm, width_mm, micron, uom, supplier)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [item_code.toUpperCase(), item_name, item_type, item_subtype, gsm, width_mm, micron, uom || 'KG', supplier]
+      [item_code.toUpperCase(), item_name, item_type, item_subtype, n(gsm), n(width_mm), n(micron), uom || 'KG', supplier]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -82,7 +84,7 @@ router.put('/:id', authorize('admin', 'store_inventory', 'ppc_planner'), async (
          updated_at = NOW()
        WHERE id = $10
        RETURNING *`,
-      [item_name, item_type, item_subtype, gsm, width_mm, micron, uom, supplier, is_active, req.params.id]
+      [item_name, item_type, item_subtype, n(gsm), n(width_mm), n(micron), uom, supplier, is_active, req.params.id]
     );
 
     if (result.rows.length === 0) {
@@ -90,6 +92,7 @@ router.put('/:id', authorize('admin', 'store_inventory', 'ppc_planner'), async (
     }
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Update raw material error:', err);
     res.status(500).json({ error: 'Failed to update raw material' });
   }
 });
