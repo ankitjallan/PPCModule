@@ -119,6 +119,16 @@ const Booking = () => {
     }
   };
 
+  const handleConfirm = async (soId) => {
+    try {
+      await orderService.updateSalesOrderStatus(soId, 'CONFIRMED');
+      showToast('Sales order confirmed');
+      loadOrders();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to confirm sales order');
+    }
+  };
+
   const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN') : '-';
 
   const columns = [
@@ -139,6 +149,11 @@ const Booking = () => {
       key: 'actions', header: 'Actions',
       render: (_, row) => (
         <div className="flex gap-1">
+          {row.status === 'PENDING' && (
+            <Button size="xs" variant="primary" onClick={() => handleConfirm(row.id)}>
+              Confirm
+            </Button>
+          )}
           {row.status === 'CONFIRMED' && !row.production_order_id && (
             <Button size="xs" variant="success" onClick={() => handleCreatePO(row.id)}>
               Create PO
